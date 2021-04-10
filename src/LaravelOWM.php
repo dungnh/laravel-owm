@@ -2,6 +2,10 @@
 namespace Gmopx\LaravelOWM;
 
 use Cmfcmf\OpenWeatherMap;
+use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
 
 class LaravelOWM
 {
@@ -14,6 +18,18 @@ class LaravelOWM
      * @var
      */
     protected $api_key;
+
+    /**
+     * Psr18 http client
+     * @var ClientInterface
+     */
+    protected $httpClient;
+
+    /**
+     * Psr17 http Factory
+     * @var RequestFactoryInterface
+     */
+    protected $httpRequestFactory;
 
     public function __construct()
     {
@@ -28,6 +44,9 @@ class LaravelOWM
         }
 
         $this->api_key = $this->config['api_key'];
+
+        $this->httpClient = Psr18ClientDiscovery::find();
+        $this->httpRequestFactory = Psr17FactoryDiscovery::findRequestFactory();
     }
 
     /**
@@ -55,11 +74,11 @@ class LaravelOWM
         $units = $units ?: 'metric';
 
         if ($cache) {
-            $owm = new OpenWeatherMap($this->api_key, null, new Cache(), $time);
+            $owm = new OpenWeatherMap($this->api_key, $this->httpClient, $this->httpRequestFactory, new Cache(), $time);
             return $owm->getWeather($query, $units, $lang);
         }
 
-        $owm = new OpenWeatherMap($this->api_key);
+        $owm = new OpenWeatherMap($this->api_key, $this->httpClient, $this->httpRequestFactory);
         return $owm->getWeather($query, $units, $lang);
     }
 

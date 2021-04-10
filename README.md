@@ -6,6 +6,12 @@
 
 `composer require coliving/laravel-owm`
 
+You will also need a PSR-17 compatible HTTP factory implementation and a PSR-18 compatible HTTP client implementation. Laravel already requires guzzle as a http client, but you may need to add a http-factory package. Choose any [from this list](https://packagist.org/providers/psr/http-factory-implementation) or use the suggested package below:
+
+```
+composer require "http-interop/http-factory-guzzle:^1.0"
+```
+
 #### 2. Add this line to your conf/app.php file
 
 For Laravel == 5.0.*
